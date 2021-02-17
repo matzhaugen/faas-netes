@@ -13,7 +13,8 @@ then
 fi
 
 if [ -f "of_${DEVENV}_portforward.pid" ]; then
-    kill $(<of_${DEVENV}_portforward.pid)
+    # If the kill fails, there is no process running and the file should be removed
+    kill $(<of_${DEVENV}_portforward.pid) || rm of_${DEVENV}_portforward.pid
 fi
 
 # quietly start portforward and put it in the background, it will not
