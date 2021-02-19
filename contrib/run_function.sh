@@ -61,4 +61,4 @@ if [ "${OPERATOR}" == "1" ]; then
     done
 fi
 
-exit 1
+exit 0
