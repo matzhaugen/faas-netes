@@ -41,7 +41,7 @@ while [[ i -lt 180 && $Ready != "Ready" ]]; do
         echo "Success: echo function is ready"
     fi
     sleep 1
-    i=$((i + 1))
+    ((i++))
 done
 
 # Apply a CRD to test the operator
