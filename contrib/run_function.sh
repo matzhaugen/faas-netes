@@ -39,15 +39,16 @@ do
     Ready="$(faas-cli describe echo | awk '{ if($1 ~ /Status:/) print $2 }')"
     if [[ $Ready == "Ready" ]];
     then
-        exit 0
+        break
     fi
+    echo "hi"
     sleep 1
 done
 
 # Apply a CRD to test the operator
 
 if [ "${OPERATOR}" == "1" ]; then
-    kubectl --context "kind-$DEVENV" apply -f ./alpine-fn.yaml
+    kubectl --context "kind-$DEVENV" apply -f ./contrib/alpine-fn.yaml
 
     for i in {1..180};
     do
