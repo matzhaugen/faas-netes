@@ -34,6 +34,9 @@ jobs:
         run: OPERATOR=${{ matrix.operator }} FAASNETES_IMAGE=kind-registry:5000/openfaas/faas-netes:${{ github.sha }} ./contrib/deploy.sh
       - name: run function
         run: OPERATOR=${{ matrix.operator }} ./contrib/run_function.sh
+      - name: load test
+        if: ${{ matrix.operator == 1 }}
+        run: ./load_test.sh
   build-multiarch:
     strategy:
       matrix:
