@@ -34,15 +34,14 @@ cat ./password.txt | faas-cli login --username admin --password-stdin
 faas-cli deploy --image=functions/alpine:latest --fprocess=cat --name "echo"
 
 # Call echo function
-for i in {1..180};
-do
+while [[ i -lt 180 && $Ready != "Ready" ]]; do
     Ready="$(faas-cli describe echo | awk '{ if($1 ~ /Status:/) print $2 }')"
     if [[ $Ready == "Ready" ]];
     then
-        break
+        echo "Success: echo function is ready"
     fi
-    echo "hi"
     sleep 1
+    i=$((i + 1))
 done
 
 # Apply a CRD to test the operator
@@ -55,6 +54,7 @@ if [ "${OPERATOR}" == "1" ]; then
         Ready="$(faas-cli describe nodeinfo | awk '{ if($1 ~ /Status:/) print $2 }')"
         if [[ $Ready == "Ready" ]];
         then
+            echo "Success: nodeinfo function is ready"
             exit 0
         fi
         sleep 1
