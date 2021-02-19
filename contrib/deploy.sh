@@ -20,7 +20,7 @@ fi
 
 
 # Only create a new password and secret if it does not already exist in the cluster
-# This makes the script idempotent.sh
+# This makes the script idempotent.
 kubectl get secret basic-auth -n openfaas --context "kind-$DEVENV" > /dev/null || \
 (PASSWORD=$(head -c 16 /dev/urandom| $sha_cmd | cut -d " " -f 1) && \
 echo -n $PASSWORD > password.txt && \
