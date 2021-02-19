@@ -36,7 +36,7 @@ jobs:
         run: OPERATOR=${{ matrix.operator }} ./contrib/run_function.sh
       - name: load test
         if: ${{ matrix.operator == 1 }}
-        run: ./load_test.sh
+        run: ./contrib/load_test.sh
   build-multiarch:
     strategy:
       matrix:

@@ -12,7 +12,9 @@ ARKADE_VERSION="0.6.21"
 echo "Downloading arkade"
 
 curl -SLs https://github.com/alexellis/arkade/releases/download/$ARKADE_VERSION/arkade > arkade
+curl -SLs https://hey-release.s3.us-east-2.amazonaws.com/hey_linux_amd64 > hey
 chmod +x ./arkade
+chmod +x ./hey
 
 
 if [[ "$1" ]]; then
@@ -25,3 +27,4 @@ fi
 ./arkade get faas-cli
 
 sudo mv $HOME/.arkade/bin/* /usr/local/bin/
+sudo mv ./hey /usr/local/bin/
