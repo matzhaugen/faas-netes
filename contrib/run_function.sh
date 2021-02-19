@@ -47,8 +47,9 @@ done
 # Apply a CRD to test the operator
 
 if [ "${OPERATOR}" == "1" ]; then
+    echo "Operator"
     kubectl --context "kind-$DEVENV" apply -f ./contrib/alpine-fn.yaml
-
+    echo "Deployed nodeinfo"
     for i in {1..180};
     do
         Ready="$(faas-cli describe nodeinfo | awk '{ if($1 ~ /Status:/) print $2 }')"
