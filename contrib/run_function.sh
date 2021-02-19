@@ -47,7 +47,7 @@ done
 # Apply a CRD to test the operator
 
 if [ "${OPERATOR}" == "1" ]; then
-    kubectl --context "kind-$DEVENV" apply ./alpine-fn.yaml
+    kubectl --context "kind-$DEVENV" apply -f ./alpine-fn.yaml
 
     for i in {1..180};
     do
