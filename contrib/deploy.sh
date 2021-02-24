@@ -34,7 +34,7 @@ if [ "${OPERATOR}" == "1" ]; then
 fi
 
 echo "Waiting for helm install to complete."
-
+echo "Using faasnetes image $FAASNETES_IMAGE"
 helm upgrade \
     --kube-context "kind-$DEVENV" \
     --install \
@@ -44,7 +44,8 @@ helm upgrade \
     --set basic_auth=true \
     --set faasnetes.image=$FAASNETES_IMAGE \
     --set functionNamespace=openfaas-fn \
-    --set operator.create=$CREATE_OPERATOR
+    --set operator.create=$CREATE_OPERATOR \
+    --set operator.image=$FAASNETES_IMAGE
 
 if [ "${OPERATOR}" == "1" ]; then
 

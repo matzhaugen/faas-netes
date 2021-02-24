@@ -15,7 +15,7 @@ kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
 containerdConfigPatches:
 - |-
-  [plugins."io.containerd.grpc.v1.cri".registry.mirrors."localhost:${REG_PORT}"]
+  [plugins."io.containerd.grpc.v1.cri".registry.mirrors."${REG_NAME}:${REG_PORT}"]
     endpoint = ["http://${REG_NAME}:${REG_PORT}"]
 EOF
 

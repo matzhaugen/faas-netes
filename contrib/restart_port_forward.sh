@@ -3,7 +3,7 @@
 DEVENV=${OF_DEV_ENV:-kind}
 
 if [ -f "of_${DEVENV}_portforward.pid" ]; then
-    kill $(<of_${DEVENV}_portforward.pid)
+    kill $(<of_${DEVENV}_portforward.pid) || echo "No port-forward process running"
 fi
 
 # quietly start portforward and put it in the background, it will not
