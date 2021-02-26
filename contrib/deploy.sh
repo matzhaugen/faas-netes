@@ -6,6 +6,7 @@ DEVENV=${OF_DEV_ENV:-kind}
 OPERATOR=${OPERATOR:-0}
 FAASNETES_IMAGE=${FAASNETES_IMAGE:-ghcr.io/openfaas/faas-netes:0.12.18}
 
+
 echo "Applying namespaces"
 kubectl --context "kind-$DEVENV" apply -f ./namespaces.yml
 
@@ -35,17 +36,19 @@ fi
 
 echo "Waiting for helm install to complete."
 echo "Using faasnetes image $FAASNETES_IMAGE"
-helm upgrade \
-    --kube-context "kind-$DEVENV" \
-    --install \
+
+helm template \
     openfaas \
     ./chart/openfaas \
     --namespace openfaas  \
     --set basic_auth=true \
     --set faasnetes.image=$FAASNETES_IMAGE \
     --set functionNamespace=openfaas-fn \
-    --set operator.create=$CREATE_OPERATOR \
-    --set operator.image=$FAASNETES_IMAGE
+    --set queueWorker.image=kind-registry:5000/cognitedata/queue-worker:dda07bf-amd64 \
+    --set gateway.image=openfaas/gateway:0.18.18 \
+    --debug > kustomize/base/base.yaml
+kustomize build kustomize/local | kubectl apply -f -
+
 
 if [ "${OPERATOR}" == "1" ]; then
 
