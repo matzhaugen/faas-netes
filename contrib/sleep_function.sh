@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+
+set -e
+
+DEVENV=${OF_DEV_ENV:-kind}
+OPERATOR=${OPERATOR:-0}
+FUNC_NAME=sleep
+kubectl --context "kind-$DEVENV" rollout status deploy/gateway -n openfaas --timeout=1m
+
+if [ $? != 0 ];
+then
+   exit 1
+fi
+
+if [ -f "of_${DEVENV}_portforward.pid" ]; then
+    # If the kill fails, there is no process running and the file should be removed
+    kill $(<of_${DEVENV}_portforward.pid) || rm of_${DEVENV}_portforward.pid
+fi
+
+# quietly start portforward and put it in the background, it will not
+# print every connection handled
+kubectl --context "kind-$DEVENV" port-forward deploy/gateway -n openfaas 31112:8080 &>/dev/null & \
+    echo -n "$!" > "of_${DEVENV}_portforward.pid"
+
+# port-forward needs some time to start
+sleep 10
+
+export OPENFAAS_URL=http://127.0.0.1:31112
+
+# Login into the gateway
+cat ./password.txt | faas-cli login --username admin --password-stdin
+
+# Deploy via the REST API which can test either the controller or operator
+faas-cli deploy --image=ghcr.io/openfaas/${FUNC_NAME}:latest --name ${FUNC_NAME} --env write_timeout=10s --env max_inflight=1
+
+# Call ${FUNC_NAME} function
+while [[ i -lt 180 && $Ready != "Ready" ]]; do
+    Ready="$(faas-cli describe ${FUNC_NAME} | awk '{ if($1 ~ /Status:/) print $2 }')"
+    if [[ $Ready == "Ready" ]];
+    then
+        echo "Success: ${FUNC_NAME} function is ready"
+    fi
+    sleep 1
+    i=$((i + 1))
+done
+
+# Apply a CRD to test the operator
+
+if [ "${OPERATOR}" == "1" ]; then
+    echo "Testing openfaas operator"
+    kubectl --context "kind-$DEVENV" apply -f ./contrib/alpine-fn.yaml
+    for i in {1..180};
+    do
+        Ready="$(faas-cli describe nodeinfo | awk '{ if($1 ~ /Status:/) print $2 }')"
+        if [[ $Ready == "Ready" ]];
+        then
+            echo "Success: nodeinfo function is ready"
+            exit 0
+        fi
+        sleep 1
+    done
+fi
+
+exit 0
